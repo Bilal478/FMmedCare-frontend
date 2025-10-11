@@ -96,11 +96,11 @@ export const LoginPage: React.FC = () => {
           </form>
 
           <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 text-center">
+            {/* <p className="text-sm text-gray-600 text-center">
               <strong>Demo Credentials:</strong><br />
               Email: admin@fmmedcare.com<br />
               Password: admin123
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
