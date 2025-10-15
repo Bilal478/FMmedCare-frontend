@@ -57,18 +57,28 @@ const initialData: PatientIntakeData = {
 };
 
 const insuranceOptions = [
-  'Medicare',
+  'Aetna',
+  'Anthem',
+  'Cigna',
+  'Clover',
+  'Humana',
   'Medicaid',
-  'Insurance',
-  'Self-Pay'
+  'Medicare',
+  'UHC',
+  'Well Care'
 ];
 
 const vendorOptions = [
-  'Vendor A - Medical Supplies',
-  'Vendor B - DME Equipment',
-  'Vendor C - Orthotic Devices',
-  'Vendor D - Mobility Aids',
-  'Vendor E - Respiratory Equipment'
+  'Allied Health Leads (DME003)',
+  'CPAP Leads (L-DME-CP)',
+  'DME Leads Pro (DME001)',
+  'Insurance Verified (L-DME-IV)',
+  'Medicare Diabetic Leads (L-DME-MD)',
+  'MedLeads USA (DME002)',
+  'Mobility Equipment (L-DME-ME)',
+  'Orthotic Leads (L-DME-OR)',
+  'SmartDME Marketing (DME004)',
+  'VerifyPatient Data (DME005)'
 ];
 
 const dmeItemOptions = [
@@ -108,6 +118,11 @@ export const PatientIntakeForm: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isLoadingEnrollmentId, setIsLoadingEnrollmentId] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [patientNameError, setPatientNameError] = useState<string | null>(null);
+  const [trackingNumberError, setTrackingNumberError] = useState<string | null>(null);
+
+
 
   const fetchEnrollmentId = async () => {
     setIsLoadingEnrollmentId(true);
@@ -134,6 +149,12 @@ export const PatientIntakeForm: React.FC = () => {
   // Validation functions for each step
   const validateStep1 = () => {
     const { patientInfo, selectionInfo } = data;
+
+    // Validate phone number
+    if (patientInfo.phone && patientInfo.phone.length !== 10) {
+      return false;
+    }
+
     return (
       selectionInfo.insurance &&
       selectionInfo.vendor &&
@@ -142,6 +163,7 @@ export const PatientIntakeForm: React.FC = () => {
       patientInfo.gender &&
       patientInfo.memberID &&
       patientInfo.phone &&
+      patientInfo.phone.length === 10 &&
       patientInfo.address &&
       patientInfo.dateOfService
     );
@@ -178,6 +200,48 @@ export const PatientIntakeForm: React.FC = () => {
   }, []);
 
   const updateData = (section: keyof PatientIntakeData, field: string, value: any) => {
+    // Special handling for phone number validation
+    if (section === 'patientInfo' && field === 'phone') {
+        if (value.length > 10) {
+          return; // Don't allow more than 10 digits
+        }
+        
+        if (value.length > 0 && value.length < 10) {
+          setPhoneError('Phone number must be exactly 10 digits');
+        } else if (value.length === 10) {
+          setPhoneError(null);
+        } else {
+          setPhoneError(null);
+        }
+    }
+
+    // Patient Name validation (letters and spaces only)
+  if (section === 'patientInfo' && field === 'patientName') {
+    const nameRegex = /^[A-Za-z\s]*$/;
+    if (value && !nameRegex.test(value)) {
+      setPatientNameError('Patient name can only contain letters and spaces');
+      return; // Don't update if invalid
+    } else {
+      setPatientNameError(null);
+    }
+  }
+  
+  // Tracking Number validation (alphanumeric, 8-22 characters)
+  if (section === 'deliveryTracking' && field === 'trackingNumber') {
+    const trackingRegex = /^[A-Za-z0-9]*$/;
+    if (value && (!trackingRegex.test(value) || value.length > 22)) {
+      if (!trackingRegex.test(value)) {
+        setTrackingNumberError('Tracking number can only contain letters and numbers');
+      } else if (value.length > 22) {
+        setTrackingNumberError('Tracking number cannot exceed 22 characters');
+      }
+      return; // Don't update if invalid
+    } else if (value && value.length < 8) {
+      setTrackingNumberError('Tracking number must be at least 8 characters');
+    } else {
+      setTrackingNumberError(null);
+    }
+  }
     setData(prev => ({
       ...prev,
       [section]: typeof prev[section] === 'object' && prev[section] !== null
@@ -330,13 +394,22 @@ export const PatientIntakeForm: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Patient Name *</label>
                 <input
-                  type="text"
-                  value={data.patientInfo.patientName}
-                  onChange={(e) => updateData('patientInfo', 'patientName', e.target.value)}
-                  disabled={!data.selectionInfo.insurance || !data.selectionInfo.vendor}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  required
-                />
+                    type="text"
+                    value={data.patientInfo.patientName}
+                    onChange={(e) => updateData('patientInfo', 'patientName', e.target.value)}
+                    disabled={!data.selectionInfo.insurance || !data.selectionInfo.vendor}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                      patientNameError 
+                        ? 'border-red-300 focus:ring-red-500' 
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
+                    placeholder="Enter patient name (letters and spaces only)"
+                    required
+                  />
+                  {patientNameError && (
+                    <p className="mt-1 text-sm text-red-600">{patientNameError}</p>
+                  )}
+
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth *</label>
@@ -344,6 +417,7 @@ export const PatientIntakeForm: React.FC = () => {
                   type="date"
                   value={data.patientInfo.dob}
                   onChange={(e) => updateData('patientInfo', 'dob', e.target.value)}
+                  onKeyDown={(e) => e.preventDefault()}
                   disabled={!data.selectionInfo.insurance || !data.selectionInfo.vendor}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   required
@@ -375,11 +449,13 @@ export const PatientIntakeForm: React.FC = () => {
                   required
                 />
               </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
                 <input
                   type="tel"
                   pattern="[0-9]*"
+                  maxLength={10}
                   onInput={(e) => {
                     const target = e.target as HTMLInputElement;
                     target.value = target.value.replace(/[^0-9]/g, '');
@@ -387,17 +463,29 @@ export const PatientIntakeForm: React.FC = () => {
                   value={data.patientInfo.phone}
                   onChange={(e) => updateData('patientInfo', 'phone', e.target.value)}
                   disabled={!data.selectionInfo.insurance || !data.selectionInfo.vendor}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                    phoneError 
+                      ? 'border-red-300 focus:ring-red-500' 
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                   placeholder="Enter phone number (numbers only)"
                   required
                 />
+                {phoneError && (
+                  <p className="mt-1 text-sm text-red-600">{phoneError}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  {data.patientInfo.phone.length}/10 digits
+                </p>
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Date of Service (DOS) *</label>
                 <input
                   type="date"
                   value={data.patientInfo.dateOfService}
                   onChange={(e) => updateData('patientInfo', 'dateOfService', e.target.value)}
+                  onKeyDown={(e) => e.preventDefault()}
                   disabled={!data.selectionInfo.insurance || !data.selectionInfo.vendor}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   required
@@ -477,6 +565,7 @@ export const PatientIntakeForm: React.FC = () => {
                     type="date"
                     value={data.clinicalInfo.dateOfPrescription}
                     onChange={(e) => updateData('clinicalInfo', 'dateOfPrescription', e.target.value)}
+                    onKeyDown={(e) => e.preventDefault()}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -609,6 +698,7 @@ export const PatientIntakeForm: React.FC = () => {
                   type="date"
                   value={data.deliveryTracking.dateOfShipment}
                   onChange={(e) => updateData('deliveryTracking', 'dateOfShipment', e.target.value)}
+                  onKeyDown={(e) => e.preventDefault()}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
@@ -619,6 +709,7 @@ export const PatientIntakeForm: React.FC = () => {
                   type="date"
                   value={data.deliveryTracking.estimatedDeliveryDate}
                   onChange={(e) => updateData('deliveryTracking', 'estimatedDeliveryDate', e.target.value)}
+                  onKeyDown={(e) => e.preventDefault()}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
@@ -643,9 +734,22 @@ export const PatientIntakeForm: React.FC = () => {
                   type="text"
                   value={data.deliveryTracking.trackingNumber}
                   onChange={(e) => updateData('deliveryTracking', 'trackingNumber', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent ${
+                    trackingNumberError 
+                      ? 'border-red-300 focus:ring-red-500' 
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
+                  placeholder="Enter tracking number (8-22 alphanumeric characters)"
+                  maxLength={22}
                   required
                 />
+                {trackingNumberError && (
+                  <p className="mt-1 text-sm text-red-600">{trackingNumberError}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  {data.deliveryTracking.trackingNumber.length}/22 characters (minimum 8)
+                </p>
+
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Proof of Delivery (POD)</label>

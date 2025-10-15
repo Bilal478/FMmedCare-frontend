@@ -38,6 +38,9 @@ export const BillingPaymentsForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  // Added this new state variable
+  const [patientNameError, setPatientNameError] = useState<string | null>(null);
+
   // Load patient intake data on component mount
   useEffect(() => {
     loadPatientIntakeData();
@@ -94,6 +97,15 @@ export const BillingPaymentsForm: React.FC = () => {
     setCurrentRecord(prev => {
       const updated = { ...prev, [field]: value };
       
+      if (field === 'patientName') {
+        const nameRegex = /^[A-Za-z\s]*$/;
+        if (value && !nameRegex.test(value)) {
+          setPatientNameError('Patient name can only contain letters and spaces');
+          return; // Don't update if invalid
+        } else {
+          setPatientNameError(null);
+        }
+      }
       // Auto-calculate fields
       if (field === 'insurancePaid') {
         updated.totalPaidBalance = value;
@@ -315,11 +327,19 @@ export const BillingPaymentsForm: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Patient Name *</label>
                 <input
-                  type="text"
-                  value={currentRecord.patientName}
-                  readOnly
-                  className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
-                />
+                    type="text"
+                    value={currentRecord.patientName}
+                    readOnly
+                    className={`w-full p-3 border rounded-lg bg-gray-100 text-gray-600 ${
+                      patientNameError 
+                        ? 'border-red-300' 
+                        : 'border-gray-300'
+                    }`}
+                  />
+                  {patientNameError && (
+                    <p className="mt-1 text-sm text-red-600">{patientNameError}</p>
+                  )}
+
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Enrollment ID *</label>
@@ -377,7 +397,7 @@ export const BillingPaymentsForm: React.FC = () => {
                   step="0.01"
                   value={currentRecord.totalClaimAmount}
                   onChange={(e) => updateCurrentRecord('totalClaimAmount', parseFloat(e.target.value) || 0)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
               <div>
@@ -387,7 +407,7 @@ export const BillingPaymentsForm: React.FC = () => {
                   step="0.01"
                   value={currentRecord.allowedAmount}
                   onChange={(e) => updateCurrentRecord('allowedAmount', parseFloat(e.target.value) || 0)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
               <div>
@@ -397,7 +417,7 @@ export const BillingPaymentsForm: React.FC = () => {
                   step="0.01"
                   value={currentRecord.insurancePaid}
                   onChange={(e) => updateCurrentRecord('insurancePaid', parseFloat(e.target.value) || 0)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
               <div>
@@ -406,6 +426,7 @@ export const BillingPaymentsForm: React.FC = () => {
                   type="date"
                   value={currentRecord.datePaid}
                   onChange={(e) => updateCurrentRecord('datePaid', e.target.value)}
+                  onKeyDown={(e) => e.preventDefault()}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -426,11 +447,11 @@ export const BillingPaymentsForm: React.FC = () => {
                 <input
                   type="number"
                   step="0.01"
-                  value={Math.max(0, currentRecord.totalClaimAmount - currentRecord.allowedAmount)}
+                  value={Math.max(0, currentRecord.allowedAmount  - currentRecord.insurancePaid)}
                   readOnly
                   className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
                 />
-                <p className="text-xs text-gray-500 mt-1">Auto-calculated: Total Claim Amount - Allowed Amount</p>
+                <p className="text-xs text-gray-500 mt-1">Auto-calculated: Allowed Amount - Insurance Paid Amount</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Total Paid Balance ($)</label>
@@ -489,6 +510,7 @@ export const BillingPaymentsForm: React.FC = () => {
                     type="date"
                     value={currentRecord.dateClaimSubmission}
                     onChange={(e) => updateCurrentRecord('dateClaimSubmission', e.target.value)}
+                    onKeyDown={(e) => e.preventDefault()}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
