@@ -121,6 +121,7 @@ export const PatientIntakeForm: React.FC = () => {
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [patientNameError, setPatientNameError] = useState<string | null>(null);
   const [trackingNumberError, setTrackingNumberError] = useState<string | null>(null);
+  const [memberIDError, setMemberIDError] = useState<string | null>(null);
 
 
 
@@ -200,6 +201,20 @@ export const PatientIntakeForm: React.FC = () => {
   }, []);
 
   const updateData = (section: keyof PatientIntakeData, field: string, value: any) => {
+
+    // Member ID validation (alphanumeric, minimum 7 characters)
+    if (section === 'patientInfo' && field === 'memberID') {
+        const memberIDRegex = /^[A-Za-z0-9]*$/;
+        if (value && !memberIDRegex.test(value)) {
+          setMemberIDError('Patient ID can only contain letters and numbers');
+          return; // Don't update if invalid
+        } else if (value && value.length < 7) {
+          setMemberIDError('Patient ID must be at least 7 characters');
+        } else {
+          setMemberIDError(null);
+        }
+      }
+
     // Special handling for phone number validation
     if (section === 'patientInfo' && field === 'phone') {
         if (value.length > 10) {
@@ -445,9 +460,21 @@ export const PatientIntakeForm: React.FC = () => {
                   value={data.patientInfo.memberID}
                   onChange={(e) => updateData('patientInfo', 'memberID', e.target.value)}
                   disabled={!data.selectionInfo.insurance || !data.selectionInfo.vendor}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                    memberIDError 
+                      ? 'border-red-300 focus:ring-red-500' 
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
+                  placeholder="Enter Patient ID (minimum 7 alphanumeric characters)"
                   required
                 />
+                {memberIDError && (
+                  <p className="mt-1 text-sm text-red-600">{memberIDError}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  {data.patientInfo.memberID.length} characters (minimum 7)
+                </p>
+
               </div>
               
               <div>
