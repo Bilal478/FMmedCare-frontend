@@ -570,7 +570,7 @@ export const AuditTrailForm: React.FC = () => {
                 {isEditing ? 'Edit Audit Record' : 'Audit Details'} - {selectedRecord.patient_name}
               </h3>
               <div className="flex items-center gap-3">
-                {!isEditing ? (
+                {/* {!isEditing ? (
                   <button
                     onClick={() => handleEditRecord(selectedRecord)}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
@@ -595,7 +595,7 @@ export const AuditTrailForm: React.FC = () => {
                       Cancel
                     </button>
                   </div>
-                )}
+                )} */}
                 <button
                   onClick={() => setSelectedRecord(null)}
                   className="text-gray-400 hover:text-gray-600 text-2xl"
