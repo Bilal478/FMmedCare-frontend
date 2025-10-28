@@ -164,7 +164,7 @@ export const BillingPaymentsForm: React.FC = () => {
         date_claim_submission: currentRecord.dateClaimSubmission,
         claim_number: currentRecord.claimNumber,
         patient_intake_id: null, // Will be set by backend based on enrollment_id
-        patient_responsibility: Math.max(0, currentRecord.totalClaimAmount - currentRecord.allowedAmount),
+        patient_responsibility: Math.max(0, currentRecord.allowedAmount - currentRecord.insurancePaid),
         total_paid_balance: currentRecord.insurancePaid
       };
       
@@ -551,7 +551,7 @@ export const BillingPaymentsForm: React.FC = () => {
       </div>
 
       {/* Records Table */}
-      {filteredRecords.length > 0 && (
+      {/* {filteredRecords.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">Billing Records ({filteredRecords.length})</h3>
@@ -624,7 +624,7 @@ export const BillingPaymentsForm: React.FC = () => {
             </table>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
