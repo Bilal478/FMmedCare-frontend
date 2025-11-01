@@ -394,8 +394,7 @@ export const BillingPaymentsForm: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Total Claim Amount ($)</label>
                 <input
                   type="number"
-                  step="0.01"
-                  value={currentRecord.totalClaimAmount}
+                  value={currentRecord.totalClaimAmount === 0 ? '' : currentRecord.totalClaimAmount}
                   onChange={(e) => updateCurrentRecord('totalClaimAmount', parseFloat(e.target.value) || 0)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
@@ -404,9 +403,9 @@ export const BillingPaymentsForm: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Allowed Amount ($)</label>
                 <input
                   type="number"
-                  step="0.01"
-                  value={currentRecord.allowedAmount}
+                  value={currentRecord.allowedAmount === 0 ? '' : currentRecord.allowedAmount}
                   onChange={(e) => updateCurrentRecord('allowedAmount', parseFloat(e.target.value) || 0)}
+                  onWheel={(e) => e.currentTarget.blur()}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
@@ -414,9 +413,9 @@ export const BillingPaymentsForm: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Insurance Paid Amount ($)</label>
                 <input
                   type="number"
-                  step="0.01"
-                  value={currentRecord.insurancePaid}
+                  value={currentRecord.insurancePaid === 0 ? '' : currentRecord.insurancePaid}
                   onChange={(e) => updateCurrentRecord('insurancePaid', parseFloat(e.target.value) || 0)}
+                  onWheel={(e) => e.currentTarget.blur()}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
