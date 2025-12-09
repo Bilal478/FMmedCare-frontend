@@ -112,8 +112,8 @@ export const PatientIntakeList: React.FC<PatientIntakeListProps> = ({ status, ti
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-          <p className="text-gray-600 mt-1">
+          <h2 className="text-2xl font-bold text-white">{title}</h2>
+          <p className="text-white-600 mt-1">
             {status === 'complete' ? 'Completed patient intake records' : 'All patient intake records'}
           </p>
         </div>
@@ -167,7 +167,7 @@ export const PatientIntakeList: React.FC<PatientIntakeListProps> = ({ status, ti
           </div>
           <button 
             onClick={loadIntakeRecords}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2  text-white rounded-lg transition-colors" style={{backgroundColor: 'rgb(30, 152, 156)'}}
           >
             <Filter className="w-4 h-4" />
             Refresh

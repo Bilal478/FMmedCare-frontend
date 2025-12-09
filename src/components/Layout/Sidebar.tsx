@@ -5,12 +5,12 @@ import {
   FileText, 
   LogOut,
   ChevronRight,
-  ChevronDown,
   Plus,
   List,
   CheckCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/logo.png';
 
 interface SidebarProps {
   currentPage: string;
@@ -21,16 +21,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
   const { user, logout } = useAuth();
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['intake', 'billing']);
 
+  const ACTIVE_BG = 'rgb(30, 152, 156)';
+  const ACTIVE_TEXT = 'white';
+
   const toggleMenu = (menuId: string) => {
-    setExpandedMenus(prev => {
-      if (prev.includes(menuId)) {
-        // If clicking on already expanded menu, collapse it
-        return prev.filter(id => id !== menuId);
-      } else {
-        // If clicking on collapsed menu, expand it and collapse others
-        return [menuId];
-      }
-    });
+    setExpandedMenus(prev =>
+      prev.includes(menuId) ? prev.filter(id => id !== menuId) : [menuId]
+    );
   };
 
   const menuItems = [
@@ -40,24 +37,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
       icon: Users,
       description: 'Manage patient information and prescriptions',
       subItems: [
-        {
-          id: 'intake-new',
-          label: 'New Enrollment',
-          icon: Plus,
-          description: 'Create new patient intake'
-        },
-        {
-          id: 'intake-complete',
-          label: 'Complete',
-          icon: CheckCircle,
-          description: 'View completed intakes'
-        },
-        {
-          id: 'intake-all',
-          label: 'All',
-          icon: List,
-          description: 'View all patient intakes'
-        }
+        { id: 'intake-new', label: 'New Enrollment', icon: Plus, description: 'Create new patient intake' },
+        { id: 'intake-complete', label: 'Complete', icon: CheckCircle, description: 'View completed intakes' },
+        { id: 'intake-all', label: 'All', icon: List, description: 'View all patient intakes' }
       ]
     },
     {
@@ -66,18 +48,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
       icon: CreditCard,
       description: 'Handle billing and payment processing',
       subItems: [
-        {
-          id: 'billing-new',
-          label: 'New Billing',
-          icon: Plus,
-          description: 'Create new billing record'
-        },
-        {
-          id: 'billing-all',
-          label: 'All',
-          icon: List,
-          description: 'View all billing records'
-        }
+        { id: 'billing-new', label: 'New Billing', icon: Plus, description: 'Create new billing record' },
+        { id: 'billing-all', label: 'All', icon: List, description: 'View all billing records' }
       ]
     },
     {
@@ -88,20 +60,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
     }
   ];
 
-  const isSubItemActive = (parentId: string, subItemId: string) => {
-    return currentPage === subItemId;
-  };
+  const isSubItemActive = (subItemId: string) => currentPage === subItemId;
 
   const isParentActive = (parentId: string, subItems?: any[]) => {
     if (!subItems) return currentPage === parentId;
-    return subItems.some(subItem => currentPage === subItem.id);
+    return subItems.some(sub => currentPage === sub.id);
   };
 
   return (
     <div className="w-80 bg-white border-r border-gray-200 h-screen flex flex-col">
+      
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-900">FMmedCare</h1>
+        <div className="flex justify-center items-center mb-4">
+          <img 
+            src={logo} 
+            alt="FM-MedCare Logo"
+            className="w-32 h-16 object-contain"
+          />
+        </div>
+
         <div className="mt-4 p-3 bg-blue-50 rounded-lg">
           <p className="font-medium text-gray-900">{user?.name}</p>
           <p className="text-sm text-gray-600">{user?.role}</p>
@@ -111,88 +89,97 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
       {/* Navigation */}
       <nav className="flex-1 p-4 overflow-y-auto">
         <ul className="space-y-2">
-          {menuItems.map((item) => {
+          {menuItems.map(item => {
             const Icon = item.icon;
-            const hasSubItems = item.subItems && item.subItems.length > 0;
+            const hasSubs = item.subItems?.length > 0;
             const isExpanded = expandedMenus.includes(item.id);
             const isActive = isParentActive(item.id, item.subItems);
-            
+
             return (
               <li key={item.id}>
-                {/* Main Menu Item */}
+                
+                {/* Main Menu Button */}
                 <button
-                  onClick={() => {
-                    if (hasSubItems) {
-                      toggleMenu(item.id);
-                    } else {
-                      onPageChange(item.id);
-                    }
-                  }}
-                  className={`w-full text-left p-4 rounded-xl transition-all duration-200 group ${
-                    isActive && !hasSubItems
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'hover:bg-gray-50 text-gray-700'
-                  }`}
+                  onClick={() => hasSubs ? toggleMenu(item.id) : onPageChange(item.id)}
+                  className="w-full text-left p-4 rounded-xl transition-all duration-200 group"
+                  style={
+                    isActive
+                      ? { backgroundColor: ACTIVE_BG, color: ACTIVE_TEXT }
+                      : {}
+                  }
                 >
                   <div className="flex items-start gap-3">
-                    <Icon className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                      isActive && !hasSubItems ? 'text-white' : 'text-gray-500 group-hover:text-blue-600'
-                    }`} />
+                    <Icon
+                      className="w-5 h-5 mt-0.5"
+                      style={{ color: isActive ? ACTIVE_TEXT : '#6b7280' }}
+                    />
+
                     <div className="flex-1">
-                      <h3 className={`font-semibold text-sm mb-1 ${
-                        isActive && !hasSubItems ? 'text-white' : 'text-gray-900'
-                      }`}>
+                      <h3
+                        className="font-semibold text-sm mb-1"
+                        style={{ color: isActive ? ACTIVE_TEXT : '#111827' }}
+                      >
                         {item.label}
                       </h3>
-                      <p className={`text-xs ${
-                        isActive && !hasSubItems ? 'text-blue-100' : 'text-gray-500'
-                      }`}>
+
+                      <p
+                        className="text-xs"
+                        style={{ color: isActive ? '#d1f7f7' : '#6b7280' }}
+                      >
                         {item.description}
                       </p>
                     </div>
-                    {hasSubItems && (
-                      <div className={`transition-transform duration-200 ${
-                        isExpanded ? 'rotate-90' : ''
-                      }`}>
-                        <ChevronRight className={`w-4 h-4 ${
-                          isActive && !hasSubItems ? 'text-white' : 'text-gray-400'
-                        }`} />
+
+                    {hasSubs && (
+                      <div
+                        className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                      >
+                        <ChevronRight
+                          className="w-4 h-4"
+                          style={{ color: isActive ? ACTIVE_TEXT : '#9ca3af' }}
+                        />
                       </div>
                     )}
                   </div>
                 </button>
 
                 {/* Sub Menu Items */}
-                {hasSubItems && isExpanded && (
+                {hasSubs && isExpanded && (
                   <ul className="mt-2 ml-4 space-y-1">
-                    {item.subItems!.map((subItem) => {
-                      const SubIcon = subItem.icon;
-                      const isSubActive = isSubItemActive(item.id, subItem.id);
-                      
+                    {item.subItems!.map(sub => {
+                      const SubIcon = sub.icon;
+                      const isSubActive = isSubItemActive(sub.id);
+
                       return (
-                        <li key={subItem.id}>
+                        <li key={sub.id}>
                           <button
-                            onClick={() => onPageChange(subItem.id)}
-                            className={`w-full text-left p-3 rounded-lg transition-all duration-200 group ${
+                            onClick={() => onPageChange(sub.id)}
+                            className="w-full text-left p-3 rounded-lg transition-all duration-200 group"
+                            style={
                               isSubActive
-                                ? 'bg-blue-600 text-white shadow-md'
-                                : 'hover:bg-blue-50 text-gray-600'
-                            }`}
+                                ? { backgroundColor: ACTIVE_BG, color: ACTIVE_TEXT }
+                                : {}
+                            }
                           >
                             <div className="flex items-center gap-3">
-                              <SubIcon className={`w-4 h-4 flex-shrink-0 ${
-                                isSubActive ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'
-                              }`} />
+                              <SubIcon
+                                className="w-4 h-4"
+                                style={{ color: isSubActive ? ACTIVE_TEXT : '#9ca3af' }}
+                              />
+
                               <div className="flex-1">
-                                <h4 className={`font-medium text-sm ${
-                                  isSubActive ? 'text-white' : 'text-gray-800'
-                                }`}>
-                                  {subItem.label}
+                                <h4
+                                  className="font-medium text-sm"
+                                  style={{ color: isSubActive ? ACTIVE_TEXT : '#1f2937' }}
+                                >
+                                  {sub.label}
                                 </h4>
-                                <p className={`text-xs ${
-                                  isSubActive ? 'text-blue-100' : 'text-gray-500'
-                                }`}>
-                                  {subItem.description}
+
+                                <p
+                                  className="text-xs"
+                                  style={{ color: isSubActive ? '#d1f7f7' : '#6b7280' }}
+                                >
+                                  {sub.description}
                                 </p>
                               </div>
                             </div>
@@ -202,6 +189,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
                     })}
                   </ul>
                 )}
+
               </li>
             );
           })}
@@ -218,6 +206,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
           <span className="font-medium">Sign Out</span>
         </button>
       </div>
+
     </div>
   );
 };

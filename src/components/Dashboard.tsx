@@ -36,7 +36,7 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50" style={{backgroundColor: 'rgb(30, 152, 156)'}}>
       <Sidebar currentPage={currentPage} onPageChange={setCurrentPage} />
       <div className="flex-1 overflow-auto">
         <div className="p-8">

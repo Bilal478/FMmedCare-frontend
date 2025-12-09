@@ -327,8 +327,8 @@ export const AuditTrailForm: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Data Structure & Audit Trail</h2>
-          <p className="text-gray-600 mt-1">Comprehensive audit logging and data structure management</p>
+          <h2 className="text-2xl font-bold text-white">Data Structure & Audit Trail</h2>
+          <p className="text-white-600 mt-1">Comprehensive audit logging and data structure management</p>
         </div>
         {/* <button
           onClick={handleExportAuditTrail}

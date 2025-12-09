@@ -912,7 +912,7 @@ export const PatientIntakeForm: React.FC = () => {
                   (currentStep === 0 && !validateStep1()) ||
                   (currentStep === 1 && !validateStep2())
                 }
-                className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-2  text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" style={{backgroundColor: 'rgb(30, 152, 156)'}}
               >
                 Next
                 <ChevronRight className="w-4 h-4" />

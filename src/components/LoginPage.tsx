@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 export const LoginPage: React.FC = () => {
   const { login, isLoading } = useAuth();
@@ -24,14 +25,18 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen from-blue-50 to-indigo-100 flex items-center justify-center p-4" style={{backgroundColor: '#1e989c'}}>
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <div className="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-              <Lock className="w-8 h-8 text-white" />
+            <div className="mx-auto w-40 h-40 mb-1 flex items-center justify-center">
+              <img 
+                src={logo}
+                alt="FM-MedCare Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">FMmedCare</h1>
+            {/* <h1 className="text-3xl font-bold text-gray-900 mb-2">FMmedCare</h1> */}
             <p className="text-gray-600">Sign in to your dashboard</p>
           </div>
 
@@ -82,7 +87,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full  text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" style={{backgroundColor: '#1e989c'}}
             >
               {isLoading ? (
                 <>

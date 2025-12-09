@@ -223,7 +223,7 @@ export const BillingPaymentsForm: React.FC = () => {
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Billing & Payments</h2>
+        <h2 className="text-2xl font-bold text-white">Billing & Payments</h2>
         <div className="flex gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -540,7 +540,7 @@ export const BillingPaymentsForm: React.FC = () => {
             <button
               onClick={handleSave}
               disabled={isLoading || !validateForm()}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-3  text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" style={{backgroundColor: 'rgb(30, 152, 156)'}}
             >
               <Save className="w-4 h-4" />
               {isLoading ? 'Saving...' : (isEditing ? 'Update Record' : 'Save Record')}
